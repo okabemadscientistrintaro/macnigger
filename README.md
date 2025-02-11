@@ -1,7 +1,11 @@
-$ conda env create -f environment.yml
+ conda env create -f environment.yml
 
-$ conda activate py396
-$ python main.py parameters.json
+ conda activate qtnano
+ python main.py parameters.json
+
+ cd "C:\Users\77077\Fe8S6Cps6"
+
+ 
 
 
 
