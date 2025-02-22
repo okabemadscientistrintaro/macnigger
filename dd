@@ -1,0 +1,64 @@
+// {
+//     "MODULES": [1,2],
+//     "ELEM1": "Cu",
+//     "ELEM2": "Zn",
+//     "NUMELEM1": 3,
+//     "NUMELEM2": 4,
+
+//     "MOD0": {
+//         "COMMENTS": "",
+//         "KMEANS": [70],
+//         "RUN_KMEANS": 10,
+//         "MAXSAMPLES": 1,
+//         "INPUT_FOLDER": "./Mod02",
+//         "OUTPUT_FOLDER": "./final_files"
+//         },
+
+//     "MOD1": {
+//         "COMMENTS": "",
+//         "RUN_MOD_ZERO": true,
+//         "INTEGRITY": 1.5,
+//         "NUMGEN": 100,
+//         "KMEANS": [3, 9, 1],
+//         "RUN_KMEANS": 10,
+//         "MAXSAMPLES": 1,
+//         "RADIUS_FACTOR": 0.5,
+//         "GAMMA": 0.2,
+//         "INPUT_FOLDER": "",
+//         "TMP_FOLDER": "./varmod1",
+//         "OUTPUT_FOLDER": "./Mod01"
+//     },
+
+//     "MOD2": {
+//         "COMMENTS": "",
+//         "MAX_GEN_PER_FRAME": 10,
+//         "PRE_SELECTION": false,
+//         "RUN_MOD_ZERO": false,
+//         "INTEGRITY": 1.5,
+//         "KMEANS": [3, 9, 1],
+//         "RUN_KMEANS": 10,
+//         "MAXSAMPLES": 1,
+//         "INPUT_FOLDER": "./Mod01",
+//         "TMP_FOLDER": "./varmod2",
+//         "OUTPUT_FOLDER": "./Mod02"
+//     },
+
+//     "MOD3": {
+//         "COMMENTS": "Ligands orientation: [-1] for random, [0 or 1] for diatomic molecules, [1,2,3] for selecting the atoms 1, 2 and 3 for orienting the ligant",
+//         "RUN_MOD_ZERO": true,
+//         "DEFORMATION": true,
+//         "INTEGRITY": 1.25,
+//         "KMEANS": [6,20,3],
+//         "RUN_KMEANS": 10,
+//         "MAXSAMPLES": 1,
+//         "LIGANDS_DISTRIBUTION": [0,5],
+//         "LIGANDS_ORIENTATION": [[-1], [0,1,2]],
+//         "N_SAMPLES": 100,
+//         "N_CORES": 100,
+//         "LIGANDS_DISTANCE": 2.25,
+//         "CORES_FOLDER": "./Cu3Zn4_structures",
+//         "LIGANDS_FOLDER": "./ligands",
+//         "TMP_FOLDER": "./varmod3",
+//         "OUTPUT_FOLDER": "./Mod03"
+//     }
+// }

@@ -1,0 +1,20 @@
+#/bin/bash
+#PBS -N FNAME
+#PBS -e report.err
+#PBS -o report.o
+#PBS -q workq
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=1:30:00
+
+
+export I_MPI_FABRICS=shm
+module load gcc/5.5
+source /opt/intel/parallel_studio_xe_2020.0.088/psxevars.sh
+
+cd $PBS_O_WORKDIR
+
+export OMP_NUM_THREADS=1
+/home/user/ABCluster/isomer FNAME.inp > FNAME.out
+
+module purge
+

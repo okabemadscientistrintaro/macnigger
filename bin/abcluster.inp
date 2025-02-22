@@ -1,0 +1,11 @@
+FNAME       # Result file name
+COMPOSITION    # Symbols
+STRUCTYPE   # Structure types
+MNUMCALC          # Maximal number of calculations
+>>>>
+cp $inp$ $xxx$.xyz
+PATH_XTB/xtb $xxx$.xyz --gfn 2 --opt normal > $xxx$.out
+Energy=`awk 'NR==2{print $2}' xtbopt.xyz` ; sed -i "2c ${Energy}" xtbopt.xyz
+cp xtbopt.xyz $out$
+rm $xxx$.xyz $xxx$.out xtbopt.log 
+>>>>

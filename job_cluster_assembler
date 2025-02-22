@@ -1,0 +1,24 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l nodes=1:ppn=16,walltime=96:00:00
+#PBS -V
+#PBS -m e
+#PBS -j oe
+#PBS -q local16
+
+cd $PBS_O_WORKDIR
+
+
+#Carregando modulo python 3.9.6 no cluster
+module load gcc/8.4/python/3.9
+
+# Instalando módulos do python 
+pip3.9 install -r requirements.txt
+
+
+# O requirements.txt é um arquivo que contém todas as dependências (pacotes do python)
+# para que a execução do programa em python funcione bem.
+
+# Execução do script python
+
+python3 main.py parameters.json

@@ -1,0 +1,66 @@
+{
+    "MODULES": [1, 2, 3],  
+    "ELEM1": "Fe",
+    "ELEM2": "S",
+    "NUMELEM1": 8,
+    "NUMELEM2": 8,
+
+    "MOD0": {
+        "COMMENTS": "",
+        "KMEANS": [10, 50, 5], 
+        "RUN_KMEANS": 10,
+        "MAXSAMPLES": 1,
+        "TMP_FOLDER": "./varmod0",
+        "INPUT_FOLDER": "./varmod0/filtered",
+        "OUTPUT_FOLDER": "./selected_kmeans"
+    },
+
+    "MOD1": {
+        "COMMENTS": "",
+        "RUN_MOD_ZERO": true,
+        "INTEGRITY": 1.1,
+        "NUMGEN": 10000,
+        "KMEANS": [10, 50, 5],
+        "RUN_KMEANS": 10,
+        "MAXSAMPLES": 1,
+        "FACTOR": 0.5,
+        "SHAPE": "SPHERE",
+        "GAMMA": 0.2,
+        "INPUT_FOLDER": "",
+        "TMP_FOLDER": "./varmod1",
+        "OUTPUT_FOLDER": "./varmod1/filtered"
+    },
+
+    "MOD2": {
+        "COMMENTS": "",
+        "MAX_GEN_PER_FRAME": 100,
+        "PRE_SELECTION": true,
+        "RUN_MOD_ZERO": true,
+        "INTEGRITY": 1,
+        "KMEANS": [10, 50, 5],
+        "RUN_KMEANS": 10,
+        "MAXSAMPLES": 1,
+        "INPUT_FOLDER": "./varmod1/filtered",
+        "TMP_FOLDER": "./varmod2",
+        "OUTPUT_FOLDER": "./varmod2/filtered"
+    },
+
+    "MOD3": {
+        "COMMENTS": "Ligands orientation: [-1] for random, [0 or 1] for diatomic molecules, [1,2,3] for selecting the atoms 1, 2 and 3 for orienting the ligant",
+        "RUN_MOD_ZERO": true,
+        "DEFORMATION": true,
+        "INTEGRITY": 1,
+        "KMEANS": [10],
+        "RUN_KMEANS": 1,
+        "MAXSAMPLES": 1,
+        "LIGANDS_DISTRIBUTION": [3],
+        "LIGANDS_ORIENTATION": [[0,1,2]],
+        "N_SAMPLES": 10,
+        "N_CORES": 300,
+        "LIGANDS_DISTANCE": 2.5,
+        "CORES_FOLDER": "./varmod2/filtered",
+        "LIGANDS_FOLDER": "./ligands",
+        "TMP_FOLDER": "./varmod3",
+        "OUTPUT_FOLDER": "./varmod3/filtered"
+    }
+}

@@ -1,0 +1,31 @@
+name: qtnano
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - numpy
+  - scipy
+  - scikit-learn
+  - flask
+  - matplotlib
+  - pillow
+  - pip
+  - tqdm
+  - werkzeug
+  - setuptools
+  - wheel
+  - zipp
+  - zlib
+  - xz
+  - tk
+  - sqlite
+  - tbb
+  - joblib
+  - jinja2
+  - certifi
+  - ca-certificates
+  - pip:
+      - itsdangerous
+      - importlib-metadata
+      - importlib-resources
