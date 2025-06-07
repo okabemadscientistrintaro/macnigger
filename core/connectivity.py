@@ -39,13 +39,13 @@ def integrity_test( tmpfolder: str, threshold: float):
                 file_ok = True
                 for index_i, index_j, dist in zip(i, j, d):
                     if dist * threshold < (cutOff[index_i] + cutOff[index_j]):
-                        print(f"DEBUG: Файл {file}  НЕ прошел тест")
+                        # print(f"DEBUG: Файл {file}  НЕ прошел тест")
                         file_ok = False
                         break
 
                 # Save the file if it passes the integrity test
                 if file_ok:
-                    print(f"DEBUG: Файл {file} прошел тест")
+                    # print(f"DEBUG: Файл {file} прошел тест")
                     shutil.copy(file, os.path.join(folder_out, os.path.basename(file)))
             except Exception as e:
                 print(f"Error processing file {file}: {e}")
