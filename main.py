@@ -95,48 +95,48 @@ def load_parameters() -> dict:
 
 
 def M0_Selection(params: dict, adhoc: bool) -> None:
-    print("\n\t\tModule 0: Representative Sample Selection:")
+	print("\n\t\tModule 0: Representative Sample Selection:")
 
-    if adhoc:
-        inputfolder = params["INPUT_FOLDER"]
-        outfolder = params["OUTPUT_FOLDER"]
-    else:
-        inputfolder = params["TMP_FOLDER"] + "/filtered"
-        outfolder = params["TMP_FOLDER"] + "/selected"
+	if adhoc:
+		inputfolder = params["INPUT_FOLDER"]
+		outfolder = params["OUTPUT_FOLDER"]
+	else:
+		inputfolder = params["TMP_FOLDER"] + "/filtered"
+		outfolder = params["TMP_FOLDER"] + "/selected"
 
-    if os.path.exists(outfolder):
-        shutil.rmtree(outfolder)  # Удаляет папку и ее содержимое
-        os.makedirs(outfolder, exist_ok=True)  # Создает новую пустую папку
-        print(f"\n\t\t\tLoading files from: {inputfolder}")
+	if os.path.exists(outfolder):
+		shutil.rmtree(outfolder)  # Удаляет папку и ее содержимое
+		os.makedirs(outfolder, exist_ok=True)  # Создает новую пустую папку
+		print(f"\n\t\t\tLoading files from: {inputfolder}")
 
-    files = sorted(glob.glob(f"{inputfolder}/*.xyz"))
-    if not files:
-        print(f"\n\t\t\tFail - Folder {inputfolder} is empty\n\n")
-        exit()
+	files = sorted(glob.glob(f"{inputfolder}/*.xyz"))
+	if not files:
+		print(f"\n\t\t\tFail - Folder {inputfolder} is empty\n\n")
+		exit()
 
-    print(f"\n\t\t\tSample Selection - Files Loaded {len(files)}")
-    if len(files) > 1:
-        coulomb, energies = tools.getCoulombEig(files)
-        sel_samples = rep.get_representatives(params, coulomb, energies, files)
-    else:
-        sel_samples = [0]
+	print(f"\n\t\t\tSample Selection - Files Loaded {len(files)}")
+	if len(files) > 1:
+		coulomb, energies = tools.getCoulombEig(files)
+		sel_samples = rep.get_representatives(params, coulomb, energies, files)
+	else:
+		sel_samples = [0]
 
-    # Проверка и исправление sel_samples
-    if isinstance(sel_samples, (list, np.ndarray)):
-        sel_samples = [int(sample[0]) if isinstance(sample, (list, np.ndarray)) else int(sample) for sample in sel_samples]
+	# Проверка и исправление sel_samples
+	if isinstance(sel_samples, (list, np.ndarray)):
+		sel_samples = [int(sample[0]) if isinstance(sample, (list, np.ndarray)) else int(sample) for sample in sel_samples]
 
-    # Копирование выбранных файлов
-    for id in sel_samples:
-        infile = files[id]
-        outfile = f"{outfolder}/{os.path.basename(infile)}"
-        shutil.copy(infile, outfile)
+	# Копирование выбранных файлов
+	for id in sel_samples:
+		infile = files[id]
+		outfile = f"{outfolder}/{os.path.basename(infile)}"
+		shutil.copy(infile, outfile)
 
-    inFiles = len(glob.glob(f"{outfolder}/*.xyz"))
-    print(f"\n\t\t\tTotal of Selected Samples: {inFiles}")
+	inFiles = len(glob.glob(f"{outfolder}/*.xyz"))
+	print(f"\n\t\t\tTotal of Selected Samples: {inFiles}")
 
-    print(f"\n\t\t\tSelected Files are available at {outfolder}")
+	print(f"\n\t\t\tSelected Files are available at {outfolder}")
 
-    print("\n\t\tEnd of module 0 - Representative Selection")
+	print("\n\t\tEnd of module 0 - Representative Selection")
 
 
 def M1_frame_family(params: dict) -> None:
@@ -159,7 +159,7 @@ def M1_frame_family(params: dict) -> None:
 	# Параметры генерации
 	num_structures = params["MOD1"]["NUMGEN"]  # Кол-во кластеров
 	atom = params["ELEM1"]  # Тип атома (Fe, S и т. д.)
-	n_atoms = params["NUMELEM1"]  # Число атомов в кластере
+	n_atoms = params["NUMELEM1"] + params["NUMELEM2"]  # Число атомов в кластере
 	shape = params["MOD1"]["SHAPE"]  # "CUBE" или "SPHERE"
 	factor = params["MOD1"]["FACTOR"]  # Коэффициент размера
 	gamma = params["MOD1"]["GAMMA"]  # Допуск по расстояниям
@@ -209,76 +209,77 @@ def M3_add_ligants(params: dict) -> None:
 	ligdist = params["MOD3"]["LIGANDS_DISTANCE"]
 	deformation = params["MOD3"]["DEFORMATION"]
 
-	# Создание директорий с безопасными путями
-	unfiltered_path = os.path.join(tmpfolder, "unfiltered")
+	# Безопасное создание директорий
+	unfiltered_path = os.path.abspath(os.path.join(tmpfolder, "unfiltered"))  # Абсолютный путь
+	filtered_path = os.path.abspath(os.path.join(tmpfolder, "filtered"))
+	selected_path = os.path.abspath(os.path.join(tmpfolder, "selected"))
 	os.makedirs(unfiltered_path, exist_ok=True)
-	os.makedirs(os.path.join(tmpfolder, "filtered"), exist_ok=True)
-	os.makedirs(os.path.join(tmpfolder, "selected"), exist_ok=True)
+	os.makedirs(filtered_path, exist_ok=True)
+	os.makedirs(selected_path, exist_ok=True)
 	os.makedirs(outfolder, exist_ok=True)
 
 	# Загрузка ядер
 	cores = sorted(glob.glob(os.path.join(coresfolder, "*.xyz")))
-	cores = cores[:ncores]  # Простой способ ограничить количество ядер
+	if len(cores) < ncores:
+		ncores = len(cores)
+	cores = cores[:ncores]
 
 	# Загрузка лигандов
 	ligands = sorted(glob.glob(os.path.join(ligandsfolder, "*.xyz")))
+
+	# Проверка доступности файлов
+	if not cores:
+		print(f"\n\t\tFail - No cores found in {coresfolder}\n")
+		return
+	if not ligands:
+		print(f"\n\t\tFail - No ligands found in {ligandsfolder}\n")
+		return
+
+	print(f"\n\t\tLoaded {len(cores)} cores and {len(ligands)} ligands.")
 
 	# Основной цикл обработки
 	for core in tqdm(cores, desc='Processing Cores'):
 		try:
 			base_name = os.path.splitext(os.path.basename(core))[0]
 			_, core_atomtypes, core_coords, _ = tools.xyzRead(core)
-			
-			# Генерация комплексов
+
 			for sim in range(numsim):
 				complex_atoms = core_atomtypes.copy()
 				complex_coords = core_coords.copy()
-				
-				# Добавление лигандов
+
+				# Генерация позиций лигандов
 				for lig_idx, numlig in enumerate(lig_distribution):
 					if numlig <= 0:
 						continue
-					
+
 					lig_path = ligands[lig_idx % len(ligands)]
 					_, lig_atomtypes, lig_coords, _ = tools.xyzRead(lig_path)
 					
-					# Простая логика добавления лиганда
-					complex_atoms.extend(lig_atomtypes)
-					complex_coords = np.concatenate((
-						complex_coords, 
-						lig_coords + np.random.rand(3) * ligdist
-					))
+					# Позиционирование нескольких лигандов
+					for _ in range(numlig):
+						shift = np.random.rand(3) * ligdist
+						rotated_ligand = complexes.rotate_atoms(lig_coords)
+						placed_ligand = rotated_ligand + shift
 
-				# Сохранение файла
-				pfile = f"{base_name}_C{sim}"
-				tools.generateXYZ(
-					complex_atoms,
-					complex_coords,
-					0.0,
-					pfile,
-					unfiltered_path
-				)
+						complex_atoms.extend(lig_atomtypes)
+						complex_coords = np.concatenate((complex_coords, placed_ligand))
+
+				# Корректный путь без двойного расширения
+				pfile = os.path.join(unfiltered_path, f"{base_name}_C{sim}.xyz")
+				tools.generateXYZ(complex_atoms, complex_coords, 0.0, pfile, unfiltered_path)
 
 		except Exception as e:
 			print(f"Error processing {core}: {str(e)}")
 			continue
 
-	# Проверка результатов
+	# Проверка целостности
 	generated_files = glob.glob(os.path.join(unfiltered_path, "*.xyz"))
 	print(f"\t\t\tTotal Generated Complexes: {len(generated_files)}")
+
 	print("\n\t\tTesting the integrity of the complexes")
 	net.integrity_test_complexes(tmpfolder, threshold)
-	inFiles = glob.glob(f"{tmpfolder}/filtered/*.xyz")
-	inFiles = len(glob.glob(f"{tmpfolder}/filtered/*.xyz"))
-	print(f"\t\t\tTotal of Complexes After The Integrity Test:: {inFiles}")
-
-	# inFiles = glob.glob(f"{tmpfolder}/filtered/*.xyz")
-	# if not inFiles:
-	# 	print("\n\nERROR: Complexes did not pass the integrity test\n\n")
-	# 	exit()
-	# if inFiles == 0:
-	# 	print("\n\nERROR: Complexes did not pass the integrity test\n\n")
-	# 	exit()
+	inFiles = glob.glob(os.path.join(filtered_path, "*.xyz"))
+	print(f"\t\t\tTotal of Complexes After The Integrity Test: {len(inFiles)}")
 	runZero= params["MOD3"]["RUN_MOD_ZERO"]
 	if runZero:
 		print("\n\t\tSelecting representative complexes (k-means)")

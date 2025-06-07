@@ -2,7 +2,7 @@
 #module load gcc/5.5
 #source /opt/intel/parallel_studio_xe_2020.0.088/psxevars.sh
 
-export OMP_NUM_THREADS=1
+export OMP_NUM_THREADS=12
 PATH_ABCLUSTER/isomer FNAME.inp > FNAME.out
 
 # module purge

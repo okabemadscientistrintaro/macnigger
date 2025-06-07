@@ -68,22 +68,47 @@ def replaceAtomSymbols(params: dict, fname: str, permut: tuple):
 
 
 def getCharge(element):
-    f = open("mol.txt")
-    atomicnum = [line.split()[1] for line in f if line.split()[0] == element]
-    f.close()
-    return int(atomicnum[0])
+    """Возвращает атомный номер для элемента."""
+    element = str(element).strip()  # Убираем пробелы
+    
+    with open("mol.txt", "r") as f:
+        atomic_dict = {line.split()[0]: int(line.split()[1]) for line in f}
+
+    if element in atomic_dict:  
+        return atomic_dict[element]  # Если передали символ ("Ni"), возвращаем его номер
+
+    if element.isdigit():  # Если передано число ("28"), ищем символ
+        for sym, num in atomic_dict.items():
+            if num == int(element):
+                return num  # Можно вернуть sym, если нужно название
+
+    print(f" Ошибка! Элемент '{element}' не найден в mol.txt")
+    return None  # Возвращаем None, чтобы избежать IndexError
+
 
 def coulombMatrix(natoms, atomtypes, coords):
-    i=0 ; j=0    
-    colM = np.zeros((natoms,natoms))
-    chargearray = np.zeros((natoms,1))
-    charge = [getCharge(symbol)  for symbol in atomtypes]
-    for i in range(0,natoms):
-        colM[i,i]=0.5*charge[i]**2.4   # Diagonal term described by Potential energy of isolated atom
-        for j in range(i+1,natoms):
-            dist= np.linalg.norm(coords[i,:] - coords[j,:])   
-            colM[j,i] = charge[i]*charge[j]/dist   #Pair-wise repulsion 
-            colM[i,j] = colM[j,i]
+    """Создаёт матрицу Кулона"""
+    colM = np.zeros((natoms, natoms))
+    chargearray = np.zeros((natoms, 1))
+
+
+    # Проверяем, переданы ли уже атомные номера:
+    if all(isinstance(atom, int) for atom in atomtypes):
+        charge = atomtypes  # Если уже числа, используем как есть
+    else:
+        charge = [getCharge(symbol) for symbol in atomtypes]
+
+    # Проверяем, есть ли None в списке зарядов
+    if None in charge:
+        raise ValueError("Ошибка! Один из элементов не найден в mol.txt.")
+
+    for i in range(natoms):
+        colM[i, i] = 0.5 * charge[i] ** 2.4  # Энергия изолированного атома
+        for j in range(i + 1, natoms):
+            dist = np.linalg.norm(coords[i, :] - coords[j, :])
+            colM[j, i] = charge[i] * charge[j] / dist  # Парное отталкивание
+            colM[i, j] = colM[j, i]
+    
     return colM
  
 def eigenCoulomb(natoms, atomtypes, coords):
